@@ -29,13 +29,15 @@ type Photo {
 
 input PostPhotoInput {
   name: String!
-  category: PhotoCategory=PORTRAIT
+  category: PhotoCategory = PORTRAIT
   description: String
 }
 
 type Query {
   totalPhotos: Int!
   allPhotos: [Photo!]!
+  totalUsers: Int!
+  allUsers: [User!]!
 }
 
 type Mutation {
