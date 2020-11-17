@@ -2,15 +2,18 @@ const { GraphQLScalarType } = require("graphql");
 
 module.exports = {
   Photo: {
-    url: (parent) => `http://example.com/img/${parent.id}.jpg`,
-    postedBy: (parent, _, ctx) => {
-      return ctx.users.find((u) => u.githubLogin === parent.githubUser);
+    id: (parent) => parent.id || parent._id,
+    url: (parent) => `http://example.com/img/${parent._id}.jpg`,
+    postedBy: (parent, _, { db }) => {
+      return db.collection("users").findOne({ githubLogin: parent.userID });
     },
-    taggedUsers: (parent, _, ctx) =>
-      ctx.tags
-        .filter((tag) => tag.photoID === parent.id)
-        .map((tag) => tag.userID)
-        .map((userID) => ctx.users.find((u) => u.githubLogin === userID)),
+    taggedUsers: async (parent, _, { db }) => {
+      const tags = await db.collection("tags").find().toArray();
+      const logins = tags
+        .filter((t) => t.photoID === parent._id.toString())
+        .map((t) => t.githubLogin);
+      return db.collection("users").find({ githubLogin: logins });
+    },
   },
   User: {
     postedPhotos: (parent, _, ctx) => {

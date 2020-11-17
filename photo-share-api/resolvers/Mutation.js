@@ -5,14 +5,19 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 module.exports = {
-  postPhoto(_, args, { db }) {
-    let _id = 0;
+  async postPhoto(_, args, { db, currentUser }) {
+    if (!currentUser) {
+      throw new Error("only an authorized user can post a photo");
+    }
+
     const newPhoto = {
-      id: _id,
       ...args.input,
+      userID: currentUser.githubLogin,
       created: new Date(),
     };
-    db.collection("photos").insert(newPhoto);
+    const { insertedIds } = await db.collection("photos").insert(newPhoto);
+    newPhoto.id = insertedIds[0];
+
     return newPhoto;
   },
 
