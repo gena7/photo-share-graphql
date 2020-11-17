@@ -1,17 +1,20 @@
 const { ApolloServer } = require("apollo-server-express");
 const { MongoClient } = require("mongodb");
-const { readFileSync } = require(`fs`);
+const { readFileSync } = require("fs");
 const express = require("express");
 const expressPlayground = require("graphql-playground-middleware-express").default;
-const typeDefs = readFileSync(`./typeDefs.graphql`, `UTF-8`);
-const resolvers = require(`./resolvers`);
-require(`dotenv`).config();
+const typeDefs = readFileSync("./typeDefs.graphql", "UTF-8");
+const resolvers = require("./resolvers");
+require("dotenv").config();
 
 async function start() {
   const app = express();
 
   const MONGO_DB = process.env.DB_HOST;
-  const client = await MongoClient.connect(MONGO_DB, { useNewUrlParser: true });
+  const client = await MongoClient.connect(MONGO_DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
   const db = client.db();
   const context = { db };
 
