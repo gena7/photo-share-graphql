@@ -1,4 +1,5 @@
 const { authorizeWithGithub } = require("../lib");
+const fetch = require("node-fetch");
 require("dotenv").config();
 
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -46,5 +47,33 @@ module.exports = {
       .replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true });
 
     return { user, token: access_token };
+  },
+
+  addFakeUsers: async (_, { count }, { db }) => {
+    const randomUserApi = `https://randomuser.me/api/?results=${count}`;
+    const { results } = await fetch(randomUserApi)
+      .then((res) => res.json())
+      .catch((err) => {
+        throw new Error(JSON.stringify(err));
+      });
+    const users = results.map((r) => ({
+      githubLogin: r.login.username,
+      name: `${r.name.first} ${r.name.last}`,
+      avatar: r.picture.thumbnail,
+      githubToken: r.login.sha1,
+    }));
+    await db.collection("users").insert(users);
+    return users;
+  },
+
+  async fakeUserAuth(_, { githubLogin }, { db }) {
+    const user = await db.collection("users").findOne({ githubLogin });
+    if (!user) {
+      throw new Error(`Cannot find user with githubLogin ${githubLogin}`);
+    }
+    return {
+      token: user.githubToken,
+      user,
+    };
   },
 };
