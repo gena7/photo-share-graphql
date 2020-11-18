@@ -4,6 +4,9 @@
   "main": "index.js",
   "author": "gena7",
   "license": "MIT",
+  "scripts": {
+    "start": "nodemon -e js,json,graphql"
+  },
   "dependencies": {
     "apollo-server-express": "^2.19.0",
     "dotenv": "^8.2.0",
@@ -12,9 +15,6 @@
     "graphql-playground-middleware-express": "^1.7.22",
     "mongodb": "^3.6.3",
     "nodemon": "^2.0.6"
-  },
-  "scripts": {
-    "start": "nodemon -e js,json,graphql"
   },
   "devDependencies": {
     "eslint": "^7.13.0"
