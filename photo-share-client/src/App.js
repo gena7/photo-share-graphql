@@ -5,8 +5,10 @@ import Users from "./Users";
 
 const App = () => (
   <BrowserRouter>
-    <AuthorizedUser />
-    <Users />;
+    <div>
+      <AuthorizedUser />
+      <Users />;
+    </div>
   </BrowserRouter>
 );
 

@@ -1,24 +1,10 @@
-import { Component } from "react";
-import { Mutation, Query } from "react-apollo";
+import React, { Component } from "react";
+// refreshing after logout doesn't work with react-apollo v3.1.5
+import { Mutation, Query, withApollo } from "react-apollo";
 import { withRouter } from "react-router-dom";
+import { compose } from "recompose";
 import { GITHUB_AUTH_MUTATION } from "./gql/mutation";
 import { ROOT_QUERY } from "./gql/query";
-
-const Me = ({ logout, requestCode, signingIn }) => (
-  <Query query={ROOT_QUERY}>
-    {({ loading, data }) => {
-      return data && data.me ? (
-        <CurrentUser {...data.me} logout={logout} />
-      ) : loading ? (
-        <p>loading...</p>
-      ) : (
-        <button onClick={requestCode} disabled={signingIn}>
-          Sign In with Github
-        </button>
-      );
-    }}
-  </Query>
-);
 
 const CurrentUser = ({ name, avatar, logout }) => (
   <div>
@@ -26,6 +12,22 @@ const CurrentUser = ({ name, avatar, logout }) => (
     <h1>{name}</h1>
     <button onClick={logout}>logout</button>
   </div>
+);
+
+const Me = ({ logout, requestCode, signingIn }) => (
+  <Query query={ROOT_QUERY}>
+    {({ loading, data }) =>
+      data.me ? (
+        <CurrentUser {...data.me} logout={logout} />
+      ) : loading ? (
+        <p>loading...</p>
+      ) : (
+        <button onClick={requestCode} disabled={signingIn}>
+          Sign In with Github
+        </button>
+      )
+    }
+  </Query>
 );
 
 class AuthorizedUser extends Component {
@@ -45,6 +47,14 @@ class AuthorizedUser extends Component {
     }
   }
 
+  logout = () => {
+    localStorage.removeItem("token");
+    let data = this.props.client.readQuery({ query: ROOT_QUERY });
+    data.me = null;
+    this.props.client.writeQuery({ query: ROOT_QUERY, data });
+    console.log(this.props.client.readQuery({ query: ROOT_QUERY }));
+  };
+
   requestCode() {
     const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
     window.location = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=user`;
@@ -63,7 +73,7 @@ class AuthorizedUser extends Component {
             <Me
               signingIn={this.state.signingIn}
               requestCode={this.requestCode}
-              logout={() => localStorage.removeItem("token")}
+              logout={this.logout}
             />
           );
         }}
@@ -72,4 +82,4 @@ class AuthorizedUser extends Component {
   }
 }
 
-export default withRouter(AuthorizedUser);
+export default compose(withApollo, withRouter)(AuthorizedUser);

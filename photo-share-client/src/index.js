@@ -1,11 +1,20 @@
-import ApolloClient, { gql } from "apollo-boost";
+import ApolloClient, { InMemoryCache } from "apollo-boost";
+import { persistCache } from "apollo-cache-persist";
 import React from "react";
 import { ApolloProvider } from "react-apollo";
 import { render } from "react-dom";
 import App from "./App";
-import "./index.css";
+
+const cache = new InMemoryCache();
+persistCache({ cache, storage: localStorage });
+
+if (localStorage["apollo-cache-persist"]) {
+  let cacheData = JSON.parse(localStorage["apollo-cache-persist"]);
+  cache.restore(cacheData);
+}
 
 const client = new ApolloClient({
+  cache,
   uri: "http://localhost:4000/graphql",
   request: (operation) => {
     operation.setContext((context) => ({
@@ -16,18 +25,6 @@ const client = new ApolloClient({
     }));
   },
 });
-
-const query = gql`
-  {
-    totalUsers
-    totalPhotos
-  }
-`;
-
-client
-  .query({ query })
-  .then(() => console.log("cache", client.extract()))
-  .catch(console.error);
 
 render(
   <ApolloProvider client={client}>
