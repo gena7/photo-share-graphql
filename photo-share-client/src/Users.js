@@ -1,7 +1,7 @@
 import React from "react";
 import { Mutation, Query } from "react-apollo";
-import { ROOT_QUERY } from "./App";
 import { ADD_FAKE_USERS_MUTATION } from "./gql/mutation";
+import { ROOT_QUERY } from "./gql/query";
 
 const Users = () => (
   <Query query={ROOT_QUERY}>

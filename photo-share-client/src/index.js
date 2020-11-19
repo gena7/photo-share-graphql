@@ -4,9 +4,19 @@ import { ApolloProvider } from "react-apollo";
 import { render } from "react-dom";
 import App from "./App";
 import "./index.css";
-// import Users from "./Users";
 
-const client = new ApolloClient({ uri: "http://localhost:4000/graphql" });
+const client = new ApolloClient({
+  uri: "http://localhost:4000/graphql",
+  request: (operation) => {
+    operation.setContext((context) => ({
+      headers: {
+        ...context.headers,
+        authorization: localStorage.getItem("token"),
+      },
+    }));
+  },
+});
+
 const query = gql`
   {
     totalUsers

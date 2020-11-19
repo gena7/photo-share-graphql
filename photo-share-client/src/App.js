@@ -1,18 +1,13 @@
-import { gql } from "apollo-boost";
 import React from "react";
+import { BrowserRouter } from "react-router-dom";
+import AuthorizedUser from "./AuthorizedUser";
 import Users from "./Users";
 
-export const ROOT_QUERY = gql`
-  query allUsers {
-    totalUsers
-    allUsers {
-      githubLogin
-      name
-      avatar
-    }
-  }
-`;
-
-const App = () => <Users />;
+const App = () => (
+  <BrowserRouter>
+    <AuthorizedUser />
+    <Users />;
+  </BrowserRouter>
+);
 
 export default App;

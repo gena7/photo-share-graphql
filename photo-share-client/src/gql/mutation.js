@@ -9,3 +9,11 @@ export const ADD_FAKE_USERS_MUTATION = gql`
     }
   }
 `;
+
+export const GITHUB_AUTH_MUTATION = gql`
+  mutation githubAuth($code: String!) {
+    githubAuth(code: $code) {
+      token
+    }
+  }
+`;
