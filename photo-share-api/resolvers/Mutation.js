@@ -6,7 +6,7 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 module.exports = {
-  async postPhoto(_, args, { db, currentUser }) {
+  async postPhoto(_, args, { db, currentUser, pubsub }) {
     if (!currentUser) {
       throw new Error("only an authorized user can post a photo");
     }
@@ -16,8 +16,10 @@ module.exports = {
       userID: currentUser.githubLogin,
       created: new Date(),
     };
-    const { insertedIds } = await db.collection("photos").insert(newPhoto);
-    newPhoto.id = insertedIds[0];
+    const { insertedId } = await db.collection("photos").insertOne(newPhoto);
+    newPhoto.id = insertedId;
+
+    pubsub.publish("photo-added", { newPhoto });
 
     return newPhoto;
   },
@@ -49,7 +51,7 @@ module.exports = {
     return { user, token: access_token };
   },
 
-  addFakeUsers: async (_, { count }, { db }) => {
+  addFakeUsers: async (_, { count }, { db, pubsub }) => {
     const randomUserApi = `https://randomuser.me/api/?results=${count}`;
     const { results } = await fetch(randomUserApi)
       .then((res) => res.json())
@@ -62,7 +64,12 @@ module.exports = {
       avatar: r.picture.thumbnail,
       githubToken: r.login.sha1,
     }));
-    await db.collection("users").insert(users);
+
+    users.forEach((newUser) => {
+      pubsub.publish("user-added", { newUser });
+    });
+
+    await db.collection("users").insertMany(users);
     return users;
   },
 
