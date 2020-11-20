@@ -7,6 +7,7 @@ const typeDefs = readFileSync("./typeDefs.graphql", "UTF-8");
 const resolvers = require("./resolvers");
 const { createServer } = require("http");
 require("dotenv").config();
+const path = require("path");
 
 async function start() {
   const app = express();
@@ -32,6 +33,7 @@ async function start() {
 
   app.get(`/`, (_, res) => res.end(`Welcome to the PhotoShare API`));
   app.get(`/playground`, expressPlayground({ endpoint: `/graphql` }));
+  app.use("/img/photos", express.static(path.join(__dirname, "assets", "photos")));
 
   const httpServer = createServer(app);
   server.installSubscriptionHandlers(httpServer);

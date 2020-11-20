@@ -1,6 +1,8 @@
 const { authorizeWithGithub } = require("../lib");
 const fetch = require("node-fetch");
 require("dotenv").config();
+const { uploadStream } = require("../lib");
+const path = require("path");
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -16,8 +18,14 @@ module.exports = {
       userID: currentUser.githubLogin,
       created: new Date(),
     };
+
     const { insertedId } = await db.collection("photos").insertOne(newPhoto);
     newPhoto.id = insertedId;
+
+    const toPath = path.join(__dirname, "..", "assets", "photo", `${newPhoto.id}.jpg`);
+
+    const { stream } = await args.input.file;
+    await uploadStream(stream, toPath);
 
     pubsub.publish("photo-added", { newPhoto });
 
