@@ -17,3 +17,13 @@ export const GITHUB_AUTH_MUTATION = gql`
     }
   }
 `;
+
+export const POST_PHOTO_MUTATION = gql`
+  mutation postPhoto($input: PostPhotoInput!) {
+    postPhoto(input: $input) {
+      id
+      name
+      url
+    }
+  }
+`;

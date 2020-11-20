@@ -22,9 +22,10 @@ module.exports = {
     const { insertedId } = await db.collection("photos").insertOne(newPhoto);
     newPhoto.id = insertedId;
 
-    const toPath = path.join(__dirname, "..", "assets", "photo", `${newPhoto.id}.jpg`);
+    const toPath = path.join(__dirname, "..", "assets", "photos", `${newPhoto.id}.jpg`);
 
-    const { stream } = await args.input.file;
+    const { createReadStream } = await args.input.file;
+    const stream = createReadStream();
     await uploadStream(stream, toPath);
 
     pubsub.publish("photo-added", { newPhoto });

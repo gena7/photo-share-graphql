@@ -1,9 +1,11 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { withApollo } from "react-apollo";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AuthorizedUser from "./AuthorizedUser";
 import { ROOT_QUERY } from "./gql/query";
 import { LISTEN_FOR_USERS } from "./gql/subscription";
+import Photos from "./Photos";
+import PostPhoto from "./PostPhoto";
 import Users from "./Users";
 
 class App extends Component {
@@ -26,8 +28,21 @@ class App extends Component {
   render() {
     return (
       <BrowserRouter>
-        <AuthorizedUser />
-        <Users />
+        <Switch>
+          <Route
+            exact
+            path="/"
+            component={() => (
+              <Fragment>
+                <AuthorizedUser />
+                <Users />
+                <Photos />
+              </Fragment>
+            )}
+          />
+          <Route path="/newPhoto" component={PostPhoto} />
+          <Route component={({ location }) => <h1>"{location.pathname}" not found</h1>} />
+        </Switch>
       </BrowserRouter>
     );
   }

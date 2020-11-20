@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 // refreshing after logout doesn't work with react-apollo v3.1.5
 import { Mutation, Query, withApollo } from "react-apollo";
-import { withRouter } from "react-router-dom";
+import { NavLink, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import { GITHUB_AUTH_MUTATION } from "./gql/mutation";
 import { ROOT_QUERY } from "./gql/query";
@@ -11,6 +11,7 @@ const CurrentUser = ({ name, avatar, logout }) => (
     <img src={avatar} width={48} height={48} alt="" />
     <h1>{name}</h1>
     <button onClick={logout}>logout</button>
+    <NavLink to="/newPhoto">Post Photo</NavLink>
   </div>
 );
 
@@ -52,7 +53,6 @@ class AuthorizedUser extends Component {
     let data = this.props.client.readQuery({ query: ROOT_QUERY });
     data.me = null;
     this.props.client.writeQuery({ query: ROOT_QUERY, data });
-    console.log(this.props.client.readQuery({ query: ROOT_QUERY }));
   };
 
   requestCode() {

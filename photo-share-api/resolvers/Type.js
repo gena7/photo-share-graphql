@@ -3,7 +3,7 @@ const { GraphQLScalarType } = require("graphql");
 module.exports = {
   Photo: {
     id: (parent) => parent.id || parent._id,
-    url: (parent) => `http://example.com/img/${parent._id}.jpg`,
+    url: (parent) => `/img/photos/${parent._id}.jpg`,
     postedBy: (parent, _, { db }) => {
       return db.collection("users").findOne({ githubLogin: parent.userID });
     },

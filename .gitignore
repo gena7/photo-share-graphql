@@ -1,4 +1,8 @@
 *.env
 *.code-workspace
+*.log
+
+*/assets/photos/**
 
 node_modules
+
